@@ -1,0 +1,82 @@
+#!groovy
+pipeline {
+
+  agent any
+
+  tools {
+    jdk 'jdk 8'
+    maven 'mvn 3.8'
+  }
+
+  environment {
+      BRANCH_NAME=env.GIT_BRANCH.replace("origin/", "")
+  }
+
+  stages {
+    stage('Build & Test') {
+      steps {
+        sh 'mvn clean verify'
+      }
+    }
+    stage('[As a Consumer] Publish Pact Contract') {
+      steps {
+        sh 'curl -LO https://github.com/pact-foundation/pact-ruby-standalone/releases/download/v1.88.83/pact-1.88.83-linux-x86_64.tar.gz'
+        sh 'tar xzf pact-1.88.83-linux-x86_64.tar.gz'
+        dir('pact/bin') {
+            sh "./pact-broker publish ../../target/pacts/ -a ${GIT_COMMIT} -t ${BRANCH_NAME} -b http://localhost:9292 -v true"
+        }
+      }
+    }
+    stage('Ask Pact Broker for deploy') {
+      script {
+        if (params.PENDING_PROVIDER != '') {
+          parallel {
+            stage('Can I deploy on SIT - Ignore pending Provider') {
+              steps {
+                dir('pact/bin') {
+                  sh "./pact-broker can-i-deploy " +
+                     "--retry-while-unknown=4 --retry-interval=10 " +
+                     "-a ProductCatalogue -e ${GIT_COMMIT} -b http://localhost:9292 " +
+                     "--to SIT --ignore=${PENDING_PROVIDER}" +
+                     " -v true"
+                }
+              }
+            }
+            stage('Can I deploy with latest version of pending Provider') {
+              steps {
+                dir('pact/bin') {
+                  sh "./pact-broker can-i-deploy " +
+                     "--retry-while-unknown=4 --retry-interval=10 " +
+                     "-a ProductCatalogue -e ${GIT_COMMIT} -a ProductService -e ${PROVIDER_BRANCH_NAME} -b http://localhost:9292 " +
+                     "--to SIT --ignore=${PendingDeployProvider}" +
+                     " -v true"
+                }
+              }
+            }
+          }
+        } else {
+          stage('Can I deploy on SIT - Ignore pending Provider') {
+            steps {
+              dir('pact/bin') {
+                sh "./pact-broker can-i-deploy " +
+                   "--retry-while-unknown=4 --retry-interval=10 " +
+                   "-a ProductCatalogue -e ${GIT_COMMIT} -b http://localhost:9292 " +
+                   "--to SIT" +
+                   " -v true"
+              }
+            }
+          }
+        }
+      }
+
+    }
+    stage('Mark as ready for deploy/merge to master') {
+      when {
+        branch 'master'
+      }
+      steps {
+        echo 'Deploying to prod now...'
+      }
+    }
+  }
+}
