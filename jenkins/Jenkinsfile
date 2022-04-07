@@ -27,8 +27,8 @@ pipeline {
         }
       }
     }
-    stage('Ask Pact Broker for deploy') {
-      script {
+
+    script {
         if (params.PENDING_PROVIDER != '') {
           parallel {
             stage('Can I deploy on SIT - Ignore pending Provider') {
@@ -55,7 +55,7 @@ pipeline {
             }
           }
         } else {
-          stage('Can I deploy on SIT - Ignore pending Provider') {
+          stage('Can I deploy on SIT') {
             steps {
               dir('pact/bin') {
                 sh "./pact-broker can-i-deploy " +
@@ -67,8 +67,6 @@ pipeline {
             }
           }
         }
-      }
-
     }
     stage('Mark as ready for deploy/merge to master') {
       when {
