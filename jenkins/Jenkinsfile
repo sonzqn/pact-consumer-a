@@ -28,7 +28,7 @@ pipeline {
       }
     }
 
-    script {
+
         if (params.PENDING_PROVIDER != '') {
           parallel {
             stage('Can I deploy on SIT - Ignore pending Provider') {
@@ -67,7 +67,7 @@ pipeline {
             }
           }
         }
-    }
+
     stage('Mark as ready for deploy/merge to master') {
       when {
         branch 'master'
