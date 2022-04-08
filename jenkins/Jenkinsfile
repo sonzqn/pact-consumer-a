@@ -9,6 +9,7 @@ pipeline {
   }
 
   parameters {
+    string(name: 'BRANCH', defaultValue: 'master', description: 'Branch to build')
     string(name: 'PENDING_PROVIDER', defaultValue: '', description: 'Name of Provider makes breaking change')
     string(name: 'PROVIDER_BRANCH_NAME', defaultValue: '', description: 'Branch name of Provider makes breaking change')
   }
