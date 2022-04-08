@@ -42,6 +42,7 @@ class ProductServiceClientPactTest {
                                 .integerType("id", 9L)
                                 .stringType("name", "Gem Visa")
                                 .stringType("type", "CREDIT_CARD")
+                                .stringType("version", "v1")
                                 .closeObject()
                                 .closeArray()
                 )
@@ -54,7 +55,7 @@ class ProductServiceClientPactTest {
        productServiceClient.setBaseUrl(mockServer.getUrl());
         List<Product> products =productServiceClient.fetchProducts().getProducts();
         assertThat(products, hasSize(2));
-        assertThat(products.get(0), is(equalTo(new Product(9L, "Gem Visa", "CREDIT_CARD", null, null))));
+        assertThat(products.get(0), is(equalTo(new Product(9L, "Gem Visa", "CREDIT_CARD", "v1", null))));
     }
 
     @Pact(consumer = "consumer-a")
