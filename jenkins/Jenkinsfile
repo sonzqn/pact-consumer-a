@@ -51,7 +51,7 @@ pipeline {
         dir('pact/bin') {
           sh "./pact-broker can-i-deploy " +
              "--retry-while-unknown=4 --retry-interval=10 " +
-             "-a consumer-a -e ${GIT_COMMIT}" +
+             "-a consumer-a -e ${GIT_COMMIT} " +
              "--to SIT -b http://localhost:9292 " +
              "--ignore=${PENDING_PROVIDER} " +
              "-v true"
