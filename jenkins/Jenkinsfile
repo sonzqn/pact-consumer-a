@@ -67,7 +67,7 @@ pipeline {
           sh "./pact-broker can-i-deploy " +
              "--retry-while-unknown=4 --retry-interval=10 " +
              "-a consumer-a -e ${GIT_COMMIT} -a ${PENDING_PROVIDER} -e ${PROVIDER_BRANCH_NAME} " +
-             "--to SIT -b http://localhost:9292 " +
+             "--to ${PROVIDER_BRANCH_NAME -b http://localhost:9292 " +
              "-v true"
         }
       }
