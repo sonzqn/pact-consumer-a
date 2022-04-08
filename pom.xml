@@ -11,8 +11,8 @@
 	<groupId>pact.cd.demo</groupId>
 	<artifactId>pact-consumer-a</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>product-catalogue</name>
-	<description>Product Catalogue service for Pact Workshop</description>
+	<name>pact-consumer-a</name>
+	<description>Consumer A service for Pact Workshop</description>
 
 	<properties>
 		<java.version>1.8</java.version>

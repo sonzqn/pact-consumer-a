@@ -25,13 +25,13 @@ import static org.hamcrest.Matchers.is;
 
 @SpringBootTest
 @ExtendWith({ WiremockResolver.class, WiremockUriResolver.class })
-class ProductServiceClientTest {
+class provider-xClientTest {
   @Autowired
-  private ProductServiceClient productServiceClient;
+  private provider-xClient provider-xClient;
 
   @Test
   void fetchProducts(@Wiremock WireMockServer server, @WiremockUri String uri) {
-    productServiceClient.setBaseUrl(uri);
+    provider-xClient.setBaseUrl(uri);
     server.stubFor(
       get(urlPathEqualTo("/products"))
         .willReturn(aResponse()
@@ -55,7 +55,7 @@ class ProductServiceClientTest {
           .withHeader("Content-Type", "application/json"))
     );
 
-    ProductServiceResponse response = productServiceClient.fetchProducts();
+    provider-xResponse response = provider-xClient.fetchProducts();
     assertThat(response.getProducts(), hasSize(2));
     assertThat(response.getProducts().stream().map(Product::getId).collect(Collectors.toSet()),
       is(equalTo(new HashSet<>(Arrays.asList(9L, 10L)))));
@@ -63,7 +63,7 @@ class ProductServiceClientTest {
 
   @Test
   void getProductById(@Wiremock WireMockServer server, @WiremockUri String uri) {
-    productServiceClient.setBaseUrl(uri);
+    provider-xClient.setBaseUrl(uri);
     server.stubFor(
       get(urlPathEqualTo("/product/10"))
         .willReturn(aResponse()
@@ -77,7 +77,7 @@ class ProductServiceClientTest {
           .withHeader("Content-Type", "application/json"))
     );
 
-    Product product = productServiceClient.getProductById(10);
+    Product product = provider-xClient.getProductById(10);
     assertThat(product, is(equalTo(new Product(10L, "28 Degrees", "CREDIT_CARD", "v1", null))));
   }
 }

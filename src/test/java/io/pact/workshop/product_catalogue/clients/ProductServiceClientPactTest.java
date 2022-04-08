@@ -22,12 +22,12 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringBootTest
 @ExtendWith(PactConsumerTestExt.class)
-@PactTestFor(providerName = "ProductService")
-class ProductServiceClientPactTest {
+@PactTestFor(providerName = "provider-x")
+class provider-xClientPactTest {
     @Autowired
-    private ProductServiceClient productServiceClient;
+    private provider-xClient provider-xClient;
 
-    @Pact(consumer = "ProductCatalogue")
+    @Pact(consumer = "consumer-a")
     public RequestResponsePact allProducts(PactDslWithProvider builder) {
         return builder
                 .given("products exists")
@@ -51,13 +51,13 @@ class ProductServiceClientPactTest {
     @Test
     @PactTestFor(pactMethod = "allProducts")
     void testAllProducts(MockServer mockServer) {
-        productServiceClient.setBaseUrl(mockServer.getUrl());
-        List<Product> products = productServiceClient.fetchProducts().getProducts();
+        provider-xClient.setBaseUrl(mockServer.getUrl());
+        List<Product> products = provider-xClient.fetchProducts().getProducts();
         assertThat(products, hasSize(2));
         assertThat(products.get(0), is(equalTo(new Product(9L, "Gem Visa", "CREDIT_CARD", null, null))));
     }
 
-    @Pact(consumer = "ProductCatalogue")
+    @Pact(consumer = "consumer-a")
     public RequestResponsePact singleProduct(PactDslWithProvider builder) {
         return builder
                 .given("product with ID 10 exists", "id", 10)
@@ -80,12 +80,12 @@ class ProductServiceClientPactTest {
     @Test
     @PactTestFor(pactMethod = "singleProduct")
     void testSingleProduct(MockServer mockServer) {
-        productServiceClient.setBaseUrl(mockServer.getUrl());
-        Product product = productServiceClient.getProductById(10L);
+        provider-xClient.setBaseUrl(mockServer.getUrl());
+        Product product = provider-xClient.getProductById(10L);
         assertThat(product, is(equalTo(new Product(10L, "28 Degrees", "CREDIT_CARD", "v1", "CC_001"))));
     }
 
-    @Pact(consumer = "ProductCatalogue")
+    @Pact(consumer = "consumer-a")
     public RequestResponsePact noProducts(PactDslWithProvider builder) {
         return builder
                 .given("no products exists")
@@ -103,12 +103,12 @@ class ProductServiceClientPactTest {
     @Test
     @PactTestFor(pactMethod = "noProducts")
     void testNoProducts(MockServer mockServer) {
-        productServiceClient.setBaseUrl(mockServer.getUrl());
-        ProductServiceResponse products = productServiceClient.fetchProducts();
+        provider-xClient.setBaseUrl(mockServer.getUrl());
+        provider-xResponse products = provider-xClient.fetchProducts();
         assertThat(products.getProducts(), hasSize(0));
     }
 
-    @Pact(consumer = "ProductCatalogue")
+    @Pact(consumer = "consumer-a")
     public RequestResponsePact singleProductNotExists(PactDslWithProvider builder) {
         return builder
                 .given("product with ID 10 does not exist", "id", 10)
@@ -123,16 +123,16 @@ class ProductServiceClientPactTest {
     @Test
     @PactTestFor(pactMethod = "singleProductNotExists")
     void testSingleProductNotExists(MockServer mockServer) {
-        productServiceClient.setBaseUrl(mockServer.getUrl());
+        provider-xClient.setBaseUrl(mockServer.getUrl());
         try {
-            productServiceClient.getProductById(10L);
+            provider-xClient.getProductById(10L);
             fail("Expected service call to throw an exception");
         } catch (HttpClientErrorException ex) {
             assertThat(ex.getMessage(), containsString("404 Not Found"));
         }
     }
 
-    @Pact(consumer = "ProductCatalogue")
+    @Pact(consumer = "consumer-a")
     public RequestResponsePact noAuthToken(PactDslWithProvider builder) {
         return builder
                 .uponReceiving("get all products with no auth token")
@@ -145,16 +145,16 @@ class ProductServiceClientPactTest {
     @Test
     @PactTestFor(pactMethod = "noAuthToken")
     void testNoAuthToken(MockServer mockServer) {
-        productServiceClient.setBaseUrl(mockServer.getUrl());
+        provider-xClient.setBaseUrl(mockServer.getUrl());
         try {
-            productServiceClient.fetchProducts();
+            provider-xClient.fetchProducts();
             fail("Expected service call to throw an exception");
         } catch (HttpClientErrorException ex) {
             assertThat(ex.getMessage(), containsString("401 Unauthorized"));
         }
     }
 
-    @Pact(consumer = "ProductCatalogue")
+    @Pact(consumer = "consumer-a")
     public RequestResponsePact noAuthToken2(PactDslWithProvider builder) {
         return builder
                 .uponReceiving("get product by ID with no auth token")
@@ -167,9 +167,9 @@ class ProductServiceClientPactTest {
     @Test
     @PactTestFor(pactMethod = "noAuthToken2")
     void testNoAuthToken2(MockServer mockServer) {
-        productServiceClient.setBaseUrl(mockServer.getUrl());
+        provider-xClient.setBaseUrl(mockServer.getUrl());
         try {
-            productServiceClient.getProductById(10L);
+            provider-xClient.getProductById(10L);
             fail("Expected service call to throw an exception");
         } catch (HttpClientErrorException ex) {
             assertThat(ex.getMessage(), containsString("401 Unauthorized"));
