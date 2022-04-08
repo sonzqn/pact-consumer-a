@@ -13,15 +13,15 @@ import java.nio.ByteBuffer;
 import java.util.Base64;
 
 @Service
-public class provider-xClient {
+public class ProductServiceClient {
   @Autowired
   private RestTemplate restTemplate;
 
   @Value("${serviceClients.products.baseUrl}")
   private String baseUrl;
 
-  public provider-xResponse fetchProducts() {
-    return callApi("/products", provider-xResponse.class);
+  public ProductServiceResponse fetchProducts() {
+    return callApi("/products", ProductServiceResponse.class);
   }
 
   public Product getProductById(long id) {

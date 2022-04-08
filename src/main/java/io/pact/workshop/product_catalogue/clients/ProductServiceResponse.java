@@ -6,6 +6,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class provider-xResponse {
+public class ProductServiceResponse {
   private List<Product> products;
 }
