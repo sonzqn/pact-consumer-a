@@ -28,26 +28,26 @@ pipeline {
       }
     }
 
-    stage('Ask Pact Broker for deploy') {
-      stage('Can I deploy on SIT') {
-        when {
-          expression { params.PENDING_PROVIDER == '' }
+    stage('Can I deploy on SIT') {
+      when {
+        expression { params.PENDING_PROVIDER == '' }
+      }
+      steps {
+        dir('pact/bin') {
+          sh "./pact-broker can-i-deploy " +
+             "--retry-while-unknown=4 --retry-interval=10 " +
+             "-a ProductCatalogue -e ${GIT_COMMIT} -b http://localhost:9292 " +
+             "--to SIT" +
+             " -v true"
         }
-        steps {
-          dir('pact/bin') {
-            sh "./pact-broker can-i-deploy " +
-               "--retry-while-unknown=4 --retry-interval=10 " +
-               "-a ProductCatalogue -e ${GIT_COMMIT} -b http://localhost:9292 " +
-               "--to SIT" +
-               " -v true"
-          }
-        }
+      }
+    }
+    stage('Can I deploy on SIT with a Pending Provider') {
+      when {
+        expression { params.PENDING_PROVIDER != '' }
       }
       stages {
         stage('Can I deploy on SIT - Ignore pending Provider') {
-          when {
-            expression { params.PENDING_PROVIDER != '' }
-          }
           steps {
             dir('pact/bin') {
               sh "./pact-broker can-i-deploy " +
