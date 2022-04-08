@@ -82,7 +82,7 @@ pipeline {
     stage('Mark as verified on SIT') {
       steps {
         dir('pact/bin') {
-            sh "./pact-broker publish ../../target/pacts/ -a ${GIT_COMMIT} -t VC_SIT -b http://localhost:9292 -v true"
+            sh "./pact-broker publish ../../target/pacts/ -a ${GIT_COMMIT} -h VC_SIT -b http://localhost:9292 -v true"
         }
       }
     }
