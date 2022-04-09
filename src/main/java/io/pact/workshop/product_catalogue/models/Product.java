@@ -7,5 +7,5 @@ public class Product {
   private final Long id;
   private final String name;
   private final String type;
-  private final String code;
+  private final String tag;
 }

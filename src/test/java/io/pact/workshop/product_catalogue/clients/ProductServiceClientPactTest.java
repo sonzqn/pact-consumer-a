@@ -71,7 +71,7 @@ class ProductServiceClientPactTest {
                                 .integerType("id", 10L)
                                 .stringType("name", "28 Degrees")
                                 .stringType("type", "CREDIT_CARD")
-                                .stringType("code", "CC_001")
+                                .stringType("tag", "CC_001")
                 )
                 .toPact();
     }
