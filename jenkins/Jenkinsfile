@@ -19,7 +19,7 @@ pipeline {
     BRANCH_NAME = env.GIT_BRANCH.replace("origin/", "")
     PACT_BROKER_URL = "http://localhost:9292"
     PB_RETRY_OPTION = "--retry-while-unknown=4 --retry-interval=10"
-    PENDING_PROVIDER_RUN_CONTRACT_JOB = params.PENDING_PROVIDER + '-run-contract-tests'
+    PENDING_PROVIDER_RUN_CONTRACT_JOB = "${PENDING_PROVIDER}-run-contract-tests"
   }
 
   stages {
