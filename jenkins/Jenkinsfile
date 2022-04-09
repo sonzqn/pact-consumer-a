@@ -39,7 +39,14 @@ pipeline {
         }
       }
     }
-    stage('Ask Pact Broker') {
+    stage('Pact Broker Verification') {
+      steps {
+        script {
+          if (env.SIT_VERSION == 'Pacticipant version not found') {
+            env.PB_RETRY_OPTION = ''
+          }
+        }
+      }
       parallel {
         stage('Can I deploy on SIT') {
           when {
