@@ -81,7 +81,7 @@ pipeline {
                     parameters: [
                         string(name: 'pactConsumerName', value: "${SERVICE_NAME}"),
                         string(name: 'pactConsumerTags', value: "${BRANCH_NAME}"),
-                        string(name: 'PROVIDER_TAG', value: "${PENDING_PROVIDER}")
+                        string(name: 'PROVIDER_TAG', value: "${PROVIDER_BRANCH_NAME}")
                     ]
         }
         dir('pact/bin') {
