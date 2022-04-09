@@ -37,6 +37,7 @@ pipeline {
             }
             sh "./pact-broker publish ../../target/pacts/ -a ${GIT_COMMIT} -t ${BRANCH_NAME} -b ${PACT_BROKER_URL} -v true"
         }
+        echo "Current SIT version: " + SIT_VERSION
       }
     }
     stage('Pact Broker Verification') {
