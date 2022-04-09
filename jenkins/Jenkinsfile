@@ -71,7 +71,8 @@ pipeline {
         expression { return params.PENDING_PROVIDER != ''; }
       }
       steps {
-        build job: '${PENDING_PROVIDER}-run-contract-tests',
+        def pending_provider_run_contract_tests_job = '${PENDING_PROVIDER}-run-contract-tests'
+        build job: pending_provider_run_contract_tests_job,
             parameters: [
                 string(name: 'pactConsumerName', value: "${SERVICE_NAME}"),
                 string(name: 'pactConsumerTags', value: "${BRANCH_NAME}"),
