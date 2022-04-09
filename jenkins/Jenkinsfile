@@ -43,7 +43,7 @@ pipeline {
 
     stage('Can I deploy on SIT') {
       when {
-        expression { params.PENDING_PROVIDER == '' }
+        expression { return params.PENDING_PROVIDER == ''; }
       }
       steps {
         dir('pact/bin') {
@@ -59,7 +59,7 @@ pipeline {
     }
     stage('Can I deploy on SIT - Ignore pending Provider') {
       when {
-        expression { params.PENDING_PROVIDER != '' }
+        expression { return params.PENDING_PROVIDER != ''; }
       }
       steps {
         dir('pact/bin') {
@@ -69,7 +69,7 @@ pipeline {
     }
     stage('Can I deploy with latest version of pending Provider') {
       when {
-        expression { params.PENDING_PROVIDER != '' }
+        expression { return params.PENDING_PROVIDER != ''; }
       }
       steps {
         dir('pact/bin') {
@@ -88,7 +88,7 @@ pipeline {
 
     stage('Deploy on SIT') {
       when {
-        expression { params.BRANCH_NAME == 'master' }
+        expression { return params.BRANCH_NAME == 'master'; }
       }
       steps {
         dir('pact/bin') {
