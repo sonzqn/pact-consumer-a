@@ -77,15 +77,15 @@ pipeline {
               currentBuild.result = "FAILURE"
               throw new Exception("PROVIDER_BRANCH_NAME must NOT empty!")
           }
-          build job: env.PENDING_PROVIDER_RUN_CONTRACT_JOB,
+          buildResults = build job: env.PENDING_PROVIDER_RUN_CONTRACT_JOB,
                     parameters: [
                         string(name: 'pactConsumerName', value: "${SERVICE_NAME}"),
                         string(name: 'pactConsumerTags', value: "${BRANCH_NAME}"),
                         string(name: 'PROVIDER_TAG', value: "${PROVIDER_BRANCH_NAME}")
                     ]
-        }
-        dir('pact/bin') {
-          sh "./pact-broker can-i-deploy --to ${PROVIDER_BRANCH_NAME} -a ${SERVICE_NAME} -e ${GIT_COMMIT} -a ${PENDING_PROVIDER} -e ${PROVIDER_BRANCH_NAME} -b ${PACT_BROKER_URL} ${PB_RETRY_OPTION}"
+          dir('pact/bin') {
+            sh "./pact-broker can-i-deploy --to ${PROVIDER_BRANCH_NAME} -a ${SERVICE_NAME} -e ${GIT_COMMIT} -a ${PENDING_PROVIDER} -e " + buildResults.getBuildVariables()["PROVIDER_VERSION"] + " -b ${PACT_BROKER_URL}"
+          }
         }
       }
     }
