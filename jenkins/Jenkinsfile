@@ -71,6 +71,12 @@ pipeline {
         expression { return params.PENDING_PROVIDER != ''; }
       }
       steps {
+        build job: '${PENDING_PROVIDER}-run-contract-tests',
+            parameters: [
+                string(name: 'pactConsumerName', value: "${SERVICE_NAME}"),
+                string(name: 'pactConsumerTags', value: "${BRANCH_NAME}"),
+                string(name: 'PROVIDER_TAG', value: "${PENDING_PROVIDER}")
+            ]
         dir('pact/bin') {
           sh "./pact-broker can-i-deploy --to ${PROVIDER_BRANCH_NAME} -a ${SERVICE_NAME} -e ${GIT_COMMIT} -a ${PENDING_PROVIDER} -e ${PROVIDER_BRANCH_NAME} -b ${PACT_BROKER_URL} ${PB_RETRY_OPTION}"
         }
