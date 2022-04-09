@@ -21,6 +21,8 @@ pipeline {
     PB_RETRY_OPTION = "--retry-while-unknown=4 --retry-interval=10"
   }
 
+  def pending_provider_run_contract_tests_job = '${PENDING_PROVIDER}-run-contract-tests'
+
   stages {
     stage('Build & Test') {
       steps {
@@ -71,7 +73,6 @@ pipeline {
         expression { return params.PENDING_PROVIDER != ''; }
       }
       steps {
-        def pending_provider_run_contract_tests_job = '${PENDING_PROVIDER}-run-contract-tests'
         build job: pending_provider_run_contract_tests_job,
             parameters: [
                 string(name: 'pactConsumerName', value: "${SERVICE_NAME}"),
