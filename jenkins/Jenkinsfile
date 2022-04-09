@@ -72,7 +72,7 @@ pipeline {
       }
       steps {
         script {
-          build job: '${PENDING_PROVIDER}-run-contract-tests',
+          build job: (script:'${PENDING_PROVIDER}-run-contract-tests'),
                     parameters: [
                         string(name: 'pactConsumerName', value: "${SERVICE_NAME}"),
                         string(name: 'pactConsumerTags', value: "${BRANCH_NAME}"),
