@@ -73,6 +73,10 @@ pipeline {
       }
       steps {
         script {
+          if (params.PROVIDER_BRANCH_NAME == '') {
+              currentBuild.result = "FAILURE"
+              throw new Exception("PROVIDER_BRANCH_NAME must NOT empty!")
+          }
           build job: env.PENDING_PROVIDER_RUN_CONTRACT_JOB,
                     parameters: [
                         string(name: 'pactConsumerName', value: "${SERVICE_NAME}"),
