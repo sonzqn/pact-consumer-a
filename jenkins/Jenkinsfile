@@ -32,6 +32,10 @@ pipeline {
     }
     stage('[As Consumer] Publish Pact Contract') {
       steps {
+        sh "service docker status"
+        sh "service docker start"
+        sh "ls -la /var/run/docker.sock"
+        sh "chown sonnd4:docker /var/run/docker.sock"
         script {
           env.SIT_VERSION = sh(script: "docker run ${DOCKER_PACT_CLI} describe-version -a ${SERVICE_NAME} -b ${PACT_BROKER_URL} -l SIT_ENV | tail -1 | cut -f 1 -d \\|", returnStdout: true).trim()
         }
