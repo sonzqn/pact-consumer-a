@@ -20,6 +20,7 @@ pipeline {
     PACT_BROKER_URL = "http://localhost:9292"
     PB_RETRY_OPTION = "--retry-while-unknown=4 --retry-interval=10"
     PENDING_PROVIDER_RUN_CONTRACT_JOB = "${PENDING_PROVIDER}-run-contract-tests"
+    DOCKER_PACT_CLI = "--network host --rm pactfoundation/pact-cli:0.50.0.21 broker"
   }
 
   stages {
@@ -30,14 +31,10 @@ pipeline {
     }
     stage('[As Consumer] Publish Pact Contract') {
       steps {
-        sh 'curl -LO https://github.com/pact-foundation/pact-ruby-standalone/releases/download/v1.88.83/pact-1.88.83-linux-x86_64.tar.gz'
-        sh 'tar xzf pact-1.88.83-linux-x86_64.tar.gz'
-        dir('pact/bin') {
-            script {
-              env.SIT_VERSION = sh(script: "./pact-broker describe-version -a ${SERVICE_NAME} -b ${PACT_BROKER_URL} -l SIT_ENV | tail -1 | cut -f 1 -d \\|", returnStdout: true).trim()
-            }
-            sh "./pact-broker publish ../../target/pacts/ -a ${GIT_COMMIT} -t ${BRANCH_NAME} -b ${PACT_BROKER_URL}"
+        script {
+          env.SIT_VERSION = sh(script: "docker run ${DOCKER_PACT_CLI} describe-version -a ${SERVICE_NAME} -b ${PACT_BROKER_URL} -l SIT_ENV | tail -1 | cut -f 1 -d \\|", returnStdout: true).trim()
         }
+        sh "docker run -v $(pwd)/target/pacts:/pacts ${DOCKER_PACT_CLI} publish ../../target/pacts/ -a ${GIT_COMMIT} -t ${BRANCH_NAME} -b ${PACT_BROKER_URL}"
         echo "Current SIT version: " + SIT_VERSION
       }
     }
@@ -47,13 +44,11 @@ pipeline {
         expression { return params.PENDING_PROVIDER == ''; }
       }
       steps {
-        dir('pact/bin') {
-          script {
-            if (env.SIT_VERSION == 'Pacticipant version not found') {//Tag the first pass contract as verified on SIT
-              sh "./pact-broker create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} -b ${PACT_BROKER_URL}"
-            }
-            sh "./pact-broker can-i-deploy --to SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} -b ${PACT_BROKER_URL} ${PB_RETRY_OPTION}"
+        script {
+          if (env.SIT_VERSION == 'Pacticipant version not found') {//Tag the first pass contract as verified on SIT
+            sh "docker run ${DOCKER_PACT_CLI} create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} -b ${PACT_BROKER_URL}"
           }
+          sh ".docker run ${DOCKER_PACT_CLI} can-i-deploy --to SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} -b ${PACT_BROKER_URL} ${PB_RETRY_OPTION}"
         }
       }
     }
@@ -62,9 +57,7 @@ pipeline {
         expression { return params.PENDING_PROVIDER != ''; }
       }
       steps {
-        dir('pact/bin') {
-          sh "./pact-broker can-i-deploy --to SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} -b ${PACT_BROKER_URL} --ignore=${PENDING_PROVIDER} ${PB_RETRY_OPTION}"
-        }
+        sh "docker run ${DOCKER_PACT_CLI} can-i-deploy --to SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} -b ${PACT_BROKER_URL} --ignore=${PENDING_PROVIDER} ${PB_RETRY_OPTION}"
       }
     }
     stage('Can I deploy with latest version of pending Provider') {
@@ -83,18 +76,14 @@ pipeline {
                         string(name: 'pactConsumerTags', value: "${BRANCH_NAME}"),
                         string(name: 'PROVIDER_TAG', value: "${PROVIDER_BRANCH_NAME}")
                     ]
-          dir('pact/bin') {
-            sh "./pact-broker can-i-deploy --to ${PROVIDER_BRANCH_NAME} -a ${SERVICE_NAME} -e ${GIT_COMMIT} -a ${PENDING_PROVIDER} -e " + buildResults.getBuildVariables()["PROVIDER_VERSION"] + " -b ${PACT_BROKER_URL}"
-          }
+          sh "docker run ${DOCKER_PACT_CLI} can-i-deploy --to ${PROVIDER_BRANCH_NAME} -a ${SERVICE_NAME} -e ${GIT_COMMIT} -a ${PENDING_PROVIDER} -e " + buildResults.getBuildVariables()["PROVIDER_VERSION"] + " -b ${PACT_BROKER_URL}"
         }
       }
     }
 
     stage('Mark as verified on SIT') {
       steps {
-        dir('pact/bin') {
-            sh "./pact-broker create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} -b ${PACT_BROKER_URL}"
-        }
+        sh "docker run ${DOCKER_PACT_CLI} create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} -b ${PACT_BROKER_URL}"
       }
     }
 
@@ -103,9 +92,7 @@ pipeline {
         expression { return env.BRANCH_NAME == 'master'; }
       }
       steps {
-        dir('pact/bin') {
-            sh "./pact-broker record-deployment --environment=SIT -a ${SERVICE_NAME} -e ${GIT_COMMIT} -b ${PACT_BROKER_URL}"
-        }
+        sh "docker run ${DOCKER_PACT_CLI} record-deployment --environment=SIT -a ${SERVICE_NAME} -e ${GIT_COMMIT} -b ${PACT_BROKER_URL}"
       }
     }
   }
