@@ -21,6 +21,8 @@ pipeline {
     PB_RETRY_OPTION = "--retry-while-unknown=4 --retry-interval=10"
     PENDING_PROVIDER_RUN_CONTRACT_JOB = "${PENDING_PROVIDER}-run-contract-tests"
     DOCKER_PACT_CLI = "--network host --rm pactfoundation/pact-cli:0.50.0.21 broker"
+    //PACT_FOLDER = env.WORKSPACE for real jenkins (non docker)
+    PACT_FOLDER = en.WORKSPACE.replace("var", "/home/sonnd4/Documents/GitHub/infrastructure/jenkins")
   }
 
   stages {
