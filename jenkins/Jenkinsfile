@@ -35,8 +35,8 @@ pipeline {
           env.SIT_VERSION = sh(script: "sudo docker run ${DOCKER_PACT_CLI} describe-version -a ${SERVICE_NAME} -b ${PACT_BROKER_URL} -l SIT_ENV | tail -1 | cut -f 1 -d \\|", returnStdout: true).trim()
         }
         sh "ls ${WORKSPACE}/target/pacts"
-        sh "sudo docker run -v ${WORKSPACE}/target/pacts:/pacts --network host --rm pactfoundation/pact-cli:0.50.0.21 ls"
-        sh "sudo docker run -v ${WORKSPACE}/target/pacts:/pacts ${DOCKER_PACT_CLI} publish /pacts -a ${GIT_COMMIT} -t ${BRANCH_NAME} -b ${PACT_BROKER_URL}"
+        sh "sudo docker run -v ${WORKSPACE}/target/pacts:/pacts:ro --network host --rm pactfoundation/pact-cli:0.50.0.21 ls /pacts"
+        sh "sudo docker run -v ${WORKSPACE}/target/pacts:/pacts:ro ${DOCKER_PACT_CLI} publish /pacts -a ${GIT_COMMIT} -t ${BRANCH_NAME} -b ${PACT_BROKER_URL}"
         echo "Current SIT version: " + SIT_VERSION
       }
     }
