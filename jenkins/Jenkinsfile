@@ -6,7 +6,6 @@ pipeline {
   tools {
     jdk 'jdk 8'
     maven 'mvn 3.8'
-    dockerTool 'docker'
   }
 
   parameters {
