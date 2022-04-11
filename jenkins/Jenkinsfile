@@ -26,17 +26,6 @@ pipeline {
   }
 
   stages {
-    stage('Pact Init') {
-      steps {
-        script {
-          env.SIT_VERSION = sh(script: "sudo docker run ${PACT_DOCKER_CLI} describe-version -a ${SERVICE_NAME} -l SIT_ENV | tail -1 | cut -f 1 -d \\|", returnStdout: true).trim()
-          echo "Latest verified SIT version: " + SIT_VERSION
-          if (env.SIT_VERSION == 'Pacticipant version not found' && env.BRANCH_NAME == 'master') {
-            sh "sudo docker run ${PACT_DOCKER_CLI} create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT}"
-          }
-        }
-      }
-    }
     stage('Build & Test') {
       steps {
         sh 'mvn clean verify'
@@ -45,6 +34,18 @@ pipeline {
     stage('[As Consumer] Publish Pact Contract') {
       steps {
         sh "sudo docker run -v ${PACT_FOLDER}/target/pacts:/pacts:ro ${PACT_DOCKER_CLI} publish /pacts -a ${GIT_COMMIT} -t ${BRANCH_NAME}"
+      }
+    }
+    stage('[Pact] Version & Tag Init') {
+      steps {
+        script {
+          env.SIT_VERSION = sh(script: "sudo docker run ${PACT_DOCKER_CLI} describe-version -a ${SERVICE_NAME} -l SIT_ENV | tail -1 | cut -f 1 -d \\|", returnStdout: true).trim()
+          echo "Latest verified SIT version: " + SIT_VERSION
+          if (env.SIT_VERSION == 'Pacticipant version not found' && env.BRANCH_NAME == 'master') {
+            sh "sudo docker run ${PACT_DOCKER_CLI} create-or-update-pacticipant --name=${SERVICE_NAME} --main-branch=${BRANCH_NAME} --repository-url=${GIT_URL}"
+            sh "sudo docker run ${PACT_DOCKER_CLI} create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT}"
+          }
+        }
       }
     }
     stage('Can I deploy on SIT') {
