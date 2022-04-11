@@ -17,16 +17,17 @@ pipeline {
   environment {
     SERVICE_NAME = "consumer-a"
     BRANCH_NAME = env.GIT_BRANCH.replace("origin/", "")
-    PENDING_PROVIDER_RUN_CONTRACT_JOB = "${PENDING_PROVIDER}-run-contract-tests"
-    PACT_BROKER_BASE_URL="http://localhost:9292"
-    PACT_BROKER_USERNAME="pb_username"
-    PACT_BROKER_PASSWORD="pb_password"
-    PACT_DOCKER_CLI = "-e PACT_BROKER_BASE_URL \
-                        -e PACT_BROKER_USERNAME \
-                        -e PACT_BROKER_PASSWORD \
-                        --network host --rm pactfoundation/pact-cli:0.50.0.21 broker"
     //PACT_FOLDER = env.WORKSPACE for real jenkins (non docker)
     PACT_FOLDER = env.WORKSPACE.replace("var", "/home/sonnd4/Documents/GitHub/infrastructure/jenkins")
+    PENDING_PROVIDER_RUN_CONTRACT_JOB = "${PENDING_PROVIDER}-run-contract-tests"
+    PACT_DOCKER_CLI = "export PACT_BROKER_BASE_URL='http://localhost:9292' ; \
+                       export PACT_BROKER_USERNAME='pb_username' ; \
+                       export PACT_BROKER_PASSWORD='pb_password' ; \
+                       sudo docker run -v ${PACT_FOLDER}/target/pacts:/pacts:ro \
+                       -e PACT_BROKER_BASE_URL \
+                       -e PACT_BROKER_USERNAME \
+                       -e PACT_BROKER_PASSWORD \
+                       --network host --rm pactfoundation/pact-cli:0.50.0.21 broker"
     PACT_RETRY_OPTION = "--retry-while-unknown=10 --retry-interval=5"
   }
 
@@ -38,17 +39,17 @@ pipeline {
     }
     stage('[As Consumer] Publish Pact Contract') {
       steps {
-        sh "sudo docker run -v ${PACT_FOLDER}/target/pacts:/pacts:ro ${PACT_DOCKER_CLI} publish /pacts -a ${GIT_COMMIT} -t ${BRANCH_NAME}"
+        sh "${PACT_DOCKER_CLI} publish /pacts -a ${GIT_COMMIT} -t ${BRANCH_NAME}"
       }
     }
     stage('[Pact] Version & Tag Init') {
       steps {
         script {
-          env.SIT_VERSION = sh(script: "sudo docker run ${PACT_DOCKER_CLI} describe-version -a ${SERVICE_NAME} -l SIT_ENV | tail -1 | cut -f 1 -d \\|", returnStdout: true).trim()
+          env.SIT_VERSION = sh(script: "${PACT_DOCKER_CLI} describe-version -a ${SERVICE_NAME} -l SIT_ENV | tail -1 | cut -f 1 -d \\|", returnStdout: true).trim()
           echo "Latest verified SIT version: " + SIT_VERSION
           if (env.SIT_VERSION == 'Pacticipant version not found' && env.BRANCH_NAME == 'master') {
-            sh "sudo docker run ${PACT_DOCKER_CLI} create-or-update-pacticipant --name=${SERVICE_NAME} --main-branch=${BRANCH_NAME} --repository-url=${GIT_URL}"
-            sh "sudo docker run ${PACT_DOCKER_CLI} create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT}"
+            sh "${PACT_DOCKER_CLI} create-or-update-pacticipant --name=${SERVICE_NAME} --main-branch=${BRANCH_NAME} --repository-url=${GIT_URL}"
+            sh "${PACT_DOCKER_CLI} create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT}"
           }
         }
       }
@@ -57,9 +58,9 @@ pipeline {
       steps {
         script {
           if (params.PENDING_PROVIDER == '') {
-            sh ".sudo docker run ${PACT_DOCKER_CLI} can-i-deploy --to SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} ${PACT_RETRY_OPTION}"
+            sh ".${PACT_DOCKER_CLI} can-i-deploy --to SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} ${PACT_RETRY_OPTION}"
           } else {//Can I deploy on SIT - Ignore pending Provider
-            sh "sudo docker run ${PACT_DOCKER_CLI} can-i-deploy --to SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} --ignore=${PENDING_PROVIDER} ${PACT_RETRY_OPTION}"
+            sh "${PACT_DOCKER_CLI} can-i-deploy --to SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT} --ignore=${PENDING_PROVIDER} ${PACT_RETRY_OPTION}"
           }
         }
       }
@@ -80,13 +81,13 @@ pipeline {
                         string(name: 'pactConsumerTags', value: "${BRANCH_NAME}"),
                         string(name: 'PROVIDER_TAG', value: "${PROVIDER_BRANCH_NAME}")
                     ]
-          sh "sudo docker run ${PACT_DOCKER_CLI} can-i-deploy --to ${PROVIDER_BRANCH_NAME} -a ${SERVICE_NAME} -e ${GIT_COMMIT} -a ${PENDING_PROVIDER} -e " + buildResults.getBuildVariables()["PROVIDER_VERSION"]
+          sh "${PACT_DOCKER_CLI} can-i-deploy --to ${PROVIDER_BRANCH_NAME} -a ${SERVICE_NAME} -e ${GIT_COMMIT} -a ${PENDING_PROVIDER} -e " + buildResults.getBuildVariables()["PROVIDER_VERSION"]
         }
       }
     }
     stage('Mark as verified on SIT') {
       steps {
-        sh "sudo docker run ${PACT_DOCKER_CLI} create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT}"
+        sh "${PACT_DOCKER_CLI} create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT}"
       }
     }
     stage('Deploy on SIT') {
@@ -94,7 +95,7 @@ pipeline {
         expression { return env.BRANCH_NAME == 'master'; }
       }
       steps {
-        sh "sudo docker run ${PACT_DOCKER_CLI} record-deployment --environment=SIT -a ${SERVICE_NAME} -e ${GIT_COMMIT}"
+        sh "${PACT_DOCKER_CLI} record-deployment --environment=SIT -a ${SERVICE_NAME} -e ${GIT_COMMIT}"
       }
     }
   }
