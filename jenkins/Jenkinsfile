@@ -24,7 +24,7 @@ pipeline {
     PACT_DOCKER_CLI = "-e PACT_BROKER_BASE_URL \
                         -e PACT_BROKER_USERNAME \
                         -e PACT_BROKER_PASSWORD \
-                        --network host --rm pactfoundation/pact-cli:0.50.0.21 broker -b ${PACT_URL}"
+                        --network host --rm pactfoundation/pact-cli:0.50.0.21 broker"
     //PACT_FOLDER = env.WORKSPACE for real jenkins (non docker)
     PACT_FOLDER = env.WORKSPACE.replace("var", "/home/sonnd4/Documents/GitHub/infrastructure/jenkins")
     PACT_RETRY_OPTION = "--retry-while-unknown=10 --retry-interval=5"
