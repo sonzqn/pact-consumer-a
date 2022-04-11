@@ -58,7 +58,7 @@ pipeline {
         }
       }
     }
-    stage('Can I deploy with latest version of pending Provider') {
+    stage('Can I deploy with Pending Provider') {
       when {
         expression { return params.PENDING_PROVIDER != ''; }
       }
