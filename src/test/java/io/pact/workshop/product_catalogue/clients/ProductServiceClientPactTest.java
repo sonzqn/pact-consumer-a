@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringBootTest
 @ExtendWith(PactConsumerTestExt.class)
-@PactTestFor(providerName = "provider-x")
+@PactTestFor(providerName = "provider-java")
 class ProductServiceClientPactTest {
     @Autowired
     private ProductServiceClient productServiceClient;
