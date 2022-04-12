@@ -27,7 +27,7 @@ class ProductServiceClientPactTest {
     @Autowired
     private ProductServiceClient productServiceClient;
 
-    @Pact(consumer = "consumer-a")
+    @Pact(consumer = "consumer-java")
     public RequestResponsePact allProducts(PactDslWithProvider builder) {
         return builder
                 .given("products exists")
@@ -57,7 +57,7 @@ class ProductServiceClientPactTest {
         assertThat(products.get(0), is(equalTo(new Product(9L, "Gem Visa", "CREDIT_CARD", null))));
     }
 
-    @Pact(consumer = "consumer-a")
+    @Pact(consumer = "consumer-java")
     public RequestResponsePact singleProduct(PactDslWithProvider builder) {
         return builder
                 .given("product with ID 10 exists", "id", 10)
@@ -84,7 +84,7 @@ class ProductServiceClientPactTest {
         assertThat(product, is(equalTo(new Product(10L, "28 Degrees", "CREDIT_CARD", "CC_001"))));
     }
 
-    @Pact(consumer = "consumer-a")
+    @Pact(consumer = "consumer-java")
     public RequestResponsePact noProducts(PactDslWithProvider builder) {
         return builder
                 .given("no products exists")
@@ -107,7 +107,7 @@ class ProductServiceClientPactTest {
         assertThat(products.getProducts(), hasSize(0));
     }
 
-    @Pact(consumer = "consumer-a")
+    @Pact(consumer = "consumer-java")
     public RequestResponsePact singleProductNotExists(PactDslWithProvider builder) {
         return builder
                 .given("product with ID 10 does not exist", "id", 10)
@@ -131,7 +131,7 @@ class ProductServiceClientPactTest {
         }
     }
 
-    @Pact(consumer = "consumer-a")
+    @Pact(consumer = "consumer-java")
     public RequestResponsePact noAuthToken(PactDslWithProvider builder) {
         return builder
                 .uponReceiving("get all products with no auth token")
@@ -153,7 +153,7 @@ class ProductServiceClientPactTest {
         }
     }
 
-    @Pact(consumer = "consumer-a")
+    @Pact(consumer = "consumer-java")
     public RequestResponsePact noAuthToken2(PactDslWithProvider builder) {
         return builder
                 .uponReceiving("get product by ID with no auth token")
