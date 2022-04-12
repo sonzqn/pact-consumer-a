@@ -2,7 +2,7 @@
 jenkins_url="http://127.0.0.1:8080"
 pact_broker_url="http://localhost:9292"
 authorization="c29ubmQ0OjExNWJhNzcyNjg0OGU5ZTJmZWYzZGU5MzdmODJkZDU2Mzg="
-consumer_name="consumer-b"
+consumer_name="consumer-a"
 curl "${pact_broker_url}/groups/${consumer_name}.csv" > consumer.csv
 providers=
 while IFS=, read -r id name field3 field4 field5 index provider_ids
