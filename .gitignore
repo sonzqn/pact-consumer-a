@@ -4,3 +4,4 @@ infrastructure/jenkins/jenkins_home/
 target/
 /pact/
 /pact-1.88.83-linux-x86_64.tar.gz
+/jenkins/consumer.csv
