@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>pact.cd.demo</groupId>
-	<artifactId>pact-consumer</artifactId>
+	<artifactId>pact-consumer-java</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>pact-consumer-java</name>
 	<description>Consumer A service for Pact Workshop</description>
