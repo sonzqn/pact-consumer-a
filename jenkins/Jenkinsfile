@@ -53,7 +53,7 @@ pipeline {
             sh "${PACT_DOCKER_CLI} create-version-tag -t SIT_ENV -a ${SERVICE_NAME} -e ${GIT_COMMIT}"
           }
           dir('jenkins') {
-             sh 'create_webhook.sh'
+             sh "bash create_webhook.sh"
           }
         }
       }
