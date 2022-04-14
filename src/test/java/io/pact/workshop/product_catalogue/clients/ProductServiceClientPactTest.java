@@ -54,7 +54,7 @@ class ProductServiceClientPactTest {
        productServiceClient.setBaseUrl(mockServer.getUrl());
         List<Product> products =productServiceClient.fetchProducts().getProducts();
         assertThat(products, hasSize(2));
-        assertThat(products.get(0), is(equalTo(new Product(9L, "Gem Visa", "CREDIT_CARD", null, null, null))));
+        assertThat(products.get(0), is(equalTo(new Product(9L, "Gem Visa", "CREDIT_CARD", null, null))));
     }
 
     @Pact(consumer = "consumer-java")
@@ -71,7 +71,6 @@ class ProductServiceClientPactTest {
                                 .integerType("id", 10L)
                                 .stringType("name", "28 Degrees")
                                 .stringType("type", "CREDIT_CARD")
-                                .stringType("tag", "CC_001")
                                 .stringType("description", "description")
                                 .integerType("price", 100L)
                 )
@@ -83,7 +82,7 @@ class ProductServiceClientPactTest {
     void testSingleProduct(MockServer mockServer) {
        productServiceClient.setBaseUrl(mockServer.getUrl());
         Product product =productServiceClient.getProductById(10L);
-        assertThat(product, is(equalTo(new Product(10L, "28 Degrees", "CREDIT_CARD", "CC_001", "description", 100L))));
+        assertThat(product, is(equalTo(new Product(10L, "28 Degrees", "CREDIT_CARD", "description", 100L))));
     }
 
     @Pact(consumer = "consumer-java")
