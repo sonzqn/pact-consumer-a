@@ -23,11 +23,15 @@ pipeline {
     string(name: 'PENDING_PROVIDER', defaultValue: '', description: """Name of Provider makes breaking change
                                                                     <ul>
                                                                      <li>2. provider-java</li>
+                                                                     <li>6. provider-java</li>
+                                                                     <li>7. provider-java</li>
                                                                     </ul>
                                                                     """)
     string(name: 'PROVIDER_BRANCH_NAME', defaultValue: '', description: """Branch name of Provider makes breaking change
     <ul>
      <li>2. provider_change_field_name</li>
+     <li>6. approve_new_field</li>
+     <li>7. approve_change_field_type</li>
     </ul>
     """)
   }
