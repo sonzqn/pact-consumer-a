@@ -20,8 +20,16 @@ pipeline {
                                                                    <li>7. consumer_change_field_type</li>
                                                                    </ul>
                                                                    """)
-    string(name: 'PENDING_PROVIDER', defaultValue: '', description: 'Name of Provider makes breaking change')
-    string(name: 'PROVIDER_BRANCH_NAME', defaultValue: '', description: 'Branch name of Provider makes breaking change')
+    string(name: 'PENDING_PROVIDER', defaultValue: '', description: """Name of Provider makes breaking change
+                                                                    <ul>
+                                                                     <li>2. provider-java</li>
+                                                                    </ul>
+                                                                    """)
+    string(name: 'PROVIDER_BRANCH_NAME', defaultValue: '', description: """Branch name of Provider makes breaking change
+    <ul>
+     <li>2. provider_change_field_name</li>
+    </ul>
+    """')
   }
 
   environment {
