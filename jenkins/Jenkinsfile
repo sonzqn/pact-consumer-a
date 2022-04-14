@@ -29,7 +29,7 @@ pipeline {
     <ul>
      <li>2. provider_change_field_name</li>
     </ul>
-    """')
+    """)
   }
 
   environment {
