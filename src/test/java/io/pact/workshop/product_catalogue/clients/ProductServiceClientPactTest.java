@@ -72,7 +72,7 @@ class ProductServiceClientPactTest {
                                 .stringType("name", "28 Degrees")
                                 .stringType("type", "CREDIT_CARD")
                                 .stringType("description", "description")
-                                .integerType("price", 100L)
+                                .decimalType("price", 99.99)
                 )
                 .toPact();
     }
@@ -82,7 +82,7 @@ class ProductServiceClientPactTest {
     void testSingleProduct(MockServer mockServer) {
        productServiceClient.setBaseUrl(mockServer.getUrl());
         Product product =productServiceClient.getProductById(10L);
-        assertThat(product, is(equalTo(new Product(10L, "28 Degrees", "CREDIT_CARD", "description", 100L))));
+        assertThat(product, is(equalTo(new Product(10L, "28 Degrees", "CREDIT_CARD", "description", 99.99))));
     }
 
     @Pact(consumer = "consumer-java")
